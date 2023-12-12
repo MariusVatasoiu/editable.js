@@ -14,18 +14,18 @@ import * as nodeType from './node-type'
  * @submodule behavior
  */
 
-export default function createDefaultBehavior (editable) {
+export default function createDefaultBehavior(editable) {
   const document = editable.win.document
   /**
-  * Factory for the default behavior.
-  * Provides default behavior of the Editable.JS API.
-  *
-  * @static
-  */
+   * Factory for the default behavior.
+   * Provides default behavior of the Editable.JS API.
+   *
+   * @static
+   */
 
   return {
     /** @param {HTMLElement} element */
-    focus (element) {
+    focus(element) {
       if (!parser.isVoid(element)) return
 
       // Add an zero width space if the editable is empty to force it to have a height
@@ -34,26 +34,30 @@ export default function createDefaultBehavior (editable) {
       element.appendChild(document.createTextNode('\uFEFF'))
     },
 
-    blur (element) {
+    blur(element) {
       // Note: there is a special case when the tab is changed where
       // we can get a blur event even if the cursor is still in the editable.
       // This blur would cause us to loose the cursor position (cause of cleanInternals()).
       // To prevent this we check if the activeElement is still the editable.
       // (Note: document.getSelection() did not work reliably in this case.)
-      if (document.activeElement === element) return
+      if (element.getRootNode()?.activeElement === element) return
 
       content.cleanInternals(element)
     },
 
-    selection (element, selection) {
-      log(selection ? 'Default selection behavior' : 'Default selection empty behavior')
+    selection(element, selection) {
+      log(
+        selection
+          ? 'Default selection behavior'
+          : 'Default selection empty behavior'
+      )
     },
 
-    cursor (element, cursor) {
+    cursor(element, cursor) {
       log(cursor ? 'Default cursor behavior' : 'Default cursor empty behavior')
     },
 
-    newline (element, cursor) {
+    newline(element, cursor) {
       // When the cursor is at the text end, we'll need to add an empty text node
       // after the br tag to ensure that the cursor shows up on the next line
       if (cursor.isAtTextEnd()) {
@@ -75,7 +79,7 @@ export default function createDefaultBehavior (editable) {
       cursor.setVisibleSelection()
     },
 
-    insert (element, direction, cursor) {
+    insert(element, direction, cursor) {
       const parent = element.parentNode
       const newElement = element.cloneNode(false)
       if (newElement.id) newElement.removeAttribute('id')
@@ -92,7 +96,7 @@ export default function createDefaultBehavior (editable) {
       }
     },
 
-    split (element, before, after, cursor) {
+    split(element, before, after, cursor) {
       const newNode = element.cloneNode(false)
       newNode.appendChild(before)
 
@@ -107,7 +111,7 @@ export default function createDefaultBehavior (editable) {
       element.focus()
     },
 
-    merge (element, direction, cursor) {
+    merge(element, direction, cursor) {
       let container, merger
 
       switch (direction) {
@@ -123,9 +127,10 @@ export default function createDefaultBehavior (editable) {
 
       if (!(container && merger)) return
 
-      cursor = container.childNodes.length > 0
-        ? editable.appendTo(container, merger.innerHTML)
-        : editable.prependTo(container, merger.innerHTML)
+      cursor =
+        container.childNodes.length > 0
+          ? editable.appendTo(container, merger.innerHTML)
+          : editable.prependTo(container, merger.innerHTML)
 
       // remove merged node
       merger.remove()
@@ -136,11 +141,11 @@ export default function createDefaultBehavior (editable) {
       cursor.setVisibleSelection()
     },
 
-    empty (element) {
+    empty(element) {
       log('Default empty behavior')
     },
 
-    switch (element, direction, cursor) {
+    switch(element, direction, cursor) {
       switch (direction) {
         case 'before':
           const previous = block.previous(element)
@@ -159,11 +164,11 @@ export default function createDefaultBehavior (editable) {
       }
     },
 
-    move (element, selection, direction) {
+    move(element, selection, direction) {
       log('Default move behavior')
     },
 
-    paste (element, blocks, cursor) {
+    paste(element, blocks, cursor) {
       if (blocks.length === 0) return
 
       cursor.insertBefore(blocks.shift())
@@ -182,19 +187,18 @@ export default function createDefaultBehavior (editable) {
       })
 
       // focus last element
-      editable.createCursorAtEnd(currentElement)
-        .setVisibleSelection()
+      editable.createCursorAtEnd(currentElement).setVisibleSelection()
     },
 
-    clipboard (element, action, cursor) {
+    clipboard(element, action, cursor) {
       log('Default clipboard behavior')
     },
 
-    toggleBold (selection) {
+    toggleBold(selection) {
       selection.toggleBold()
     },
 
-    toggleEmphasis (selection) {
+    toggleEmphasis(selection) {
       selection.toggleEmphasis()
     }
   }
